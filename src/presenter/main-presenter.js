@@ -3,25 +3,24 @@ import SortView from '../view/sort-view.js';
 import CreateEventView from '../view/create-view.js';
 import EventListView from '../view/event-list-view.js';
 import EventView from '../view/event-view.js';
-
-const COUNT_RENDER = 3;
-
 export default class MainPresenter {
   sortComponent = new SortView();
-  createEventComponent = new CreateEventView();
   eventListComponent = new EventListView();
 
-  constructor({container}) {
+  constructor({container, pointsModel}) {
     this.container = container;
+    this.pointsModel = pointsModel;
   }
 
   init() {
+    this.points = [...this.pointsModel.getPoints()];
+
     render(this.sortComponent, this.container);
     render(this.eventListComponent, this.container);
-    render(this.createEventComponent, this.eventListComponent.getElement());
+    render(new CreateEventView({point: this.points[0]}), this.eventListComponent.getElement());
 
-    for (let i = 0; i < COUNT_RENDER; i++) {
-      render(new EventView(), this.eventListComponent.getElement());
+    for (let i = 1; i < this.points.length; i++) {
+      render(new EventView({point: this.points[i]}), this.eventListComponent.getElement());
     }
   }
 }
