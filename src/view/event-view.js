@@ -1,5 +1,5 @@
-import {createElement} from '../render.js';
-import {humanizePointDate, humanizePointTime, findDurationPointTime} from '../utils.js';
+import AbstractView from '../framework/view/abstract-view.js';
+import {humanizePointDate, humanizePointTime, findDurationPointTime} from '../utils/point.js';
 
 function createEventTemplate(point) {
   const {type, price, destination, isFavorite, offers, dateFrom, dateTo} = point;
@@ -50,24 +50,25 @@ function createEventTemplate(point) {
   );
 }
 
-export default class EventView {
-  constructor({point}) {
-    this.point = point;
+export default class EventView extends AbstractView {
+  #point = null;
+  #handleEditClick = null;
+
+  constructor({point, onEditClick}) {
+    super();
+    this.#point = point;
+    this.#handleEditClick = onEditClick;
+
+    this.element.querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#editClickHandler);
   }
 
-  getTemplate() {
-    return createEventTemplate(this.point);
+  get template() {
+    return createEventTemplate(this.#point);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
+  #editClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleEditClick();
+  };
 }

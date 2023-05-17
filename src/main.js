@@ -1,6 +1,6 @@
 import FilterView from './view/filter-view.js';
 import HeaderView from './view/header-view.js';
-import {RenderPosition, render} from './render.js';
+import {RenderPosition, render} from './framework/render.js';
 
 import MainPresenter from './presenter/main-presenter.js';
 

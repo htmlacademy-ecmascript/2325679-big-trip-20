@@ -1,6 +1,7 @@
-import {createElement} from '../render.js';
-import {convertDateTimePoint} from '../utils.js';
+import AbstractView from '../framework/view/abstract-view.js';
+import {convertDateTimePoint} from '../utils/point.js';
 import {mockOffers} from '../mock/point.js';
+
 
 function createOffer (offers, isOffer) {
   return (
@@ -148,24 +149,27 @@ function createBlockTemplate(point) {
   );
 }
 
-export default class CreateEventView {
-  constructor({point}) {
-    this.point = point;
+export default class EditEventView extends AbstractView {
+  #point = null;
+  #handleFormSubmit = null;
+
+  constructor({point, onFormSubmit}) {
+    super();
+    this.#point = point;
+    this.#handleFormSubmit = onFormSubmit;
+
+    this.element.querySelector('form')
+      .addEventListener('submit', this.#formSubmitHandler);
+    this.element.querySelector('form')
+      .addEventListener('reset', this.#formSubmitHandler);
   }
 
-  getTemplate() {
-    return createBlockTemplate(this.point);
+  get template() {
+    return createBlockTemplate(this.#point);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFormSubmit();
+  };
 }
