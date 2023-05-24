@@ -1,16 +1,18 @@
-import {render, replace} from '../framework/render.js';
+import {render, RenderPosition} from '../framework/render.js';
 import SortView from '../view/sort-view.js';
-import EditEventView from '../view/edit-view.js';
 import EventListView from '../view/event-list-view.js';
-import EventView from '../view/event-view.js';
 import NoPointView from '../view/no-point-view.js';
+import PointPresenter from './point-presenter.js';
+import {updateItem} from '../utils/common.js';
 export default class MainPresenter {
   #sortComponent = new SortView();
   #eventListComponent = new EventListView();
+  #noPointComponent = new NoPointView();
 
   #container = null;
   #pointsModel = null;
   #points = [];
+  #pointPresenters = new Map();
 
   constructor({container, pointsModel}) {
     this.#container = container;
@@ -19,56 +21,57 @@ export default class MainPresenter {
 
   init() {
     this.#points = [...this.#pointsModel.points];
-
     this.#renderBoard();
   }
 
-  #renderEvent(point) {
-    const escKeyDownHandler = (evt) => {
-      if (evt.key === 'Escape') {
-        evt.preventDefault();
-        replaceFormToCard();
-        document.removeEventListener('keydown', escKeyDownHandler);
-      }
-    };
-
-    const pointComponent = new EventView({
-      point,
-      onEditClick: () => {
-        replaceCardToForm();
-        document.addEventListener('keydown', escKeyDownHandler);
-      }
+  #renderPoint(point) {
+    const pointPresenter = new PointPresenter({
+      eventListContainer: this.#eventListComponent.element,
+      onDataChange: this.#handlePointChange,
+      onModeChange: this.#handleModeChange
     });
+    pointPresenter.init(point);
+    this.#pointPresenters.set(point.id, pointPresenter);
+  }
 
-    const pointEditComponent = new EditEventView({
-      point,
-      onFormSubmit: () => {
-        replaceFormToCard();
-        document.removeEventListener('keydown', escKeyDownHandler);
-      }
-    });
+  #handleModeChange = () => {
+    this.#pointPresenters.forEach((presenter) => presenter.resetView());
+  };
 
-    function replaceCardToForm() {
-      replace(pointEditComponent, pointComponent);
-    }
+  #handlePointChange = (updatedPoint) => {
+    this.#points = updateItem(this.#points, updatedPoint);
+    this.#pointPresenters.get(updatedPoint.id).init(updatedPoint);
+  };
 
-    function replaceFormToCard() {
-      replace(pointComponent, pointEditComponent);
-    }
+  #renderSort() {
+    render(this.#sortComponent, this.#container, RenderPosition.AFTERBEGIN);
+  }
 
-    render(pointComponent, this.#eventListComponent.element);
+  #renderPoints() {
+    this.#points
+      .forEach((point) => this.#renderPoint(point));
+  }
+
+  #renderNoPoints() {
+    render(this.#noPointComponent, this.#container, RenderPosition.AFTERBEGIN);
+  }
+
+  #clearPointList() {
+    this.#pointPresenters.forEach((presenter) => presenter.destroy());
+    this.#pointPresenters.clear();
+  }
+
+  #renderEventList() {
+    render(this.#eventListComponent, this.#container);
+    this.#renderPoints();
   }
 
   #renderBoard() {
-    render(this.#sortComponent, this.#container);
-    render(this.#eventListComponent, this.#container);
+    this.#renderSort();
+    this.#renderEventList();
 
     if (this.#points.length === 0) {
-      render(new NoPointView(), this.#container);
-      return;
-    }
-    for (let i = 0; i < this.#points.length; i++) {
-      this.#renderEvent(this.#points[i]);
+      this.#renderNoPoints();
     }
   }
 }
