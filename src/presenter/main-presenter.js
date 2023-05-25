@@ -1,4 +1,4 @@
-import {render, RenderPosition} from '../framework/render.js';
+import {render, RenderPosition, remove} from '../framework/render.js';
 import SortView from '../view/sort-view.js';
 import EventListView from '../view/event-list-view.js';
 import NoPointView from '../view/no-point-view.js';
@@ -80,7 +80,7 @@ export default class MainPresenter {
 
     this.#sortPoints(sortType);
     this.#clearPointList();
-    this.#renderEventList();
+    this.#renderBoard();
   };
 
   #renderSort() {
@@ -103,6 +103,7 @@ export default class MainPresenter {
   #clearPointList() {
     this.#pointPresenters.forEach((presenter) => presenter.destroy());
     this.#pointPresenters.clear();
+    remove(this.#sortComponent);
   }
 
   #renderEventList() {
