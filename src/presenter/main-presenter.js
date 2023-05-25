@@ -54,6 +54,9 @@ export default class MainPresenter {
 
   #sortPoints(sortType) {
     switch (sortType) {
+      case SortType.DEFAULT:
+        this.#points.sort(sortPointUp);
+        break;
       case SortType.TIME:
         this.#points.sort(sortTimeUp);
         break;
@@ -82,9 +85,9 @@ export default class MainPresenter {
 
   #renderSort() {
     this.#sortComponent = new SortView({
-      onSortTypeChange: this.#handleSortTypeChange
+      onSortTypeChange: this.#handleSortTypeChange,
+      currentSortType: this.#currentSortType
     });
-
     render(this.#sortComponent, this.#container, RenderPosition.AFTERBEGIN);
   }
 

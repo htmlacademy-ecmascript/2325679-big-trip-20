@@ -10,7 +10,7 @@ const FilterType = {
 };
 
 const SortType = {
-  DEFAULT: 'defult',
+  DEFAULT: 'default',
   TIME: 'time',
   PRICE: 'price',
 };
