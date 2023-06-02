@@ -1,6 +1,5 @@
-import {nanoid} from 'nanoid';
-import {getRandomArrayElement, getRandomNumber} from '../utils/common.js';
-import {TYPES_OF_POINT} from '../const.js';
+import { nanoid } from 'nanoid';
+import { getRandomArrayElement, getRandomNumber } from '../utils/common.js';
 
 const mockDestinations = [
   {
@@ -78,253 +77,243 @@ const mockDestinations = [
 
 const mockOffers = [
   {
-    id: '20',
-    type: 'business',
-    title: 'Upgrade to a business class',
-    price: 120
+    'type': 'taxi',
+    'offers': [
+      {
+        'id': nanoid(),
+        'title': 'Order an economy taxi',
+        'price': 200
+      },
+      {
+        'id': nanoid(),
+        'title': 'Order a comfort class taxi',
+        'price': 280
+      },
+      {
+        'id': nanoid(),
+        'title': 'Order a business class taxi',
+        'price': 350
+      }
+    ]
   },
   {
-    id: '21',
-    type: 'luggage',
-    title: 'Add luggage',
-    price: 30
+    'type': 'bus',
+    'offers': [
+      {
+        'id': nanoid(),
+        'title': 'Order a bus for 10 people',
+        'price': 560
+      },
+      {
+        'id': nanoid(),
+        'title': 'Order a bus for 30 people',
+        'price': 800
+      }
+    ]
   },
   {
-    id: '22',
-    type: 'comfort',
-    title: 'Switch to comfort class',
-    price: 100
+    'type': 'train',
+    'offers': [
+      {
+        'id': nanoid(),
+        'title': 'Order reserved seat',
+        'price': 370
+      },
+      {
+        'id': nanoid(),
+        'title': 'Order a seat in coupe',
+        'price': 450
+      }
+    ]
   },
   {
-    id: '23',
-    type: 'meal',
-    title: 'Add meal',
-    price: 15
+    'type': 'ship',
+    'offers': [
+      {
+        'id': nanoid(),
+        'title': 'Order an economy ship',
+        'price': 390
+      },
+      {
+        'id': nanoid(),
+        'title': 'Order a comfort class ship',
+        'price': 560
+      },
+      {
+        'id': nanoid(),
+        'title': 'Order a business class ship',
+        'price': 780
+      }
+    ]
   },
   {
-    id: '24',
-    type: 'seats',
-    title: 'Choose seats',
-    price: 5
+    'type': 'drive',
+    'offers': [
+      {
+        'id': nanoid(),
+        'title': 'Order an economy car',
+        'price': 260
+      },
+      {
+        'id': nanoid(),
+        'title': 'Order a comfort class car',
+        'price': 340
+      },
+      {
+        'id': nanoid(),
+        'title': 'Order a business class car',
+        'price': 410
+      }
+    ]
   },
   {
-    id: '25',
-    type: 'train',
-    title: 'Travel by train',
-    price: 40
-  }
+    'type': 'flight',
+    'offers': [
+      {
+        'id': nanoid(),
+        'title': 'Order an economy flight',
+        'price': 480
+      },
+      {
+        'id': nanoid(),
+        'title': 'Order a comfort class flight',
+        'price': 600
+      },
+      {
+        'id': nanoid(),
+        'title': 'Order a business class flight',
+        'price': 820
+      }
+    ]
+  },
 ];
+
 
 const mockPoints = [
   {
     id: '1',
-    type: getRandomArrayElement(TYPES_OF_POINT),
-    destination: mockDestinations.find((value) => value.id === '10'),
+    type: 'train',
+    destination: '10',
     dateFrom: '2023-04-24T18:25',
     dateTo: '2023-04-24T22:36',
     price: getRandomNumber(50, 500),
     isFavorite: false,
-    isOffer: {
-      20: false,
-      21: false,
-      22: true,
-      23: false,
-      24: true,
-      25: true
-    },
     offers: [
-      mockOffers.find((value) => value.id === '22'),
-      mockOffers.find((value) => value.id === '24'),
-      mockOffers.find((value) => value.id === '25'),
+      mockOffers[2].offers[0].id
     ]
   },
   {
     id: '2',
-    type: getRandomArrayElement(TYPES_OF_POINT),
-    destination: mockDestinations.find((value) => value.id === '14'),
+    type: 'drive',
+    destination: '14',
     dateFrom: '2023-04-26T22:55',
     dateTo: '2023-04-27T02:18',
     price: getRandomNumber(50, 500),
     isFavorite: true,
-    isOffer: {
-      20: false,
-      21: true,
-      22: false,
-      23: false,
-      24: false,
-      25: false
-    },
     offers: [
-      mockOffers.find((value) => value.id === '21')
+      mockOffers[4].offers[0].id,
+      mockOffers[4].offers[2].id
     ]
   },
   {
     id: '3',
-    type: getRandomArrayElement(TYPES_OF_POINT),
-    destination: mockDestinations.find((value) => value.id === '10'),
+    type: 'taxi',
+    destination: '10',
     dateFrom: '2023-05-03T04:28',
     dateTo: '2023-05-03T08:52',
     price: getRandomNumber(50, 500),
     isFavorite: false,
-    isOffer: {
-      20: false,
-      21: true,
-      22: false,
-      23: false,
-      24: true,
-      25: true
-    },
     offers: [
-      mockOffers.find((value) => value.id === '21'),
-      mockOffers.find((value) => value.id === '24'),
-      mockOffers.find((value) => value.id === '25')
+      mockOffers[0].offers[1].id
     ]
   },
   {
     id: '4',
-    type: getRandomArrayElement(TYPES_OF_POINT),
-    destination: mockDestinations.find((value) => value.id === '12'),
+    type: 'ship',
+    destination: '12',
     dateFrom: '2023-05-04T17:31',
     dateTo: '2023-05-04T21:43',
     price: getRandomNumber(50, 500),
     isFavorite: false,
-    isOffer: {
-      20: true,
-      21: false,
-      22: false,
-      23: true,
-      24: false,
-      25: false
-    },
     offers: [
-      mockOffers.find((value) => value.id === '20'),
-      mockOffers.find((value) => value.id === '23')
+      mockOffers[3].offers[1].id,
+      mockOffers[3].offers[2].id
     ]
   },
   {
     id: '5',
-    type: getRandomArrayElement(TYPES_OF_POINT),
-    destination: mockDestinations.find((value) => value.id === '11'),
+    type: 'bus',
+    destination: '11',
     dateFrom: '2023-05-06T23:14',
     dateTo: '2023-05-07T05:17',
     price: getRandomNumber(50, 500),
     isFavorite: true,
-    isOffer: {
-      20: false,
-      21: true,
-      22: true,
-      23: false,
-      24: false,
-      25: true
-    },
     offers: [
-      mockOffers.find((value) => value.id === '21'),
-      mockOffers.find((value) => value.id === '22'),
-      mockOffers.find((value) => value.id === '25')
+      mockOffers[1].offers[1].id
     ]
   },
   {
     id: '6',
-    type: getRandomArrayElement(TYPES_OF_POINT),
-    destination: mockDestinations.find((value) => value.id === '13'),
+    type: 'flight',
+    destination: '13',
     dateFrom: '2023-05-10T14:38',
     dateTo: '2023-05-10T19:20',
     price: getRandomNumber(50, 500),
     isFavorite: true,
-    isOffer: {
-      20: true,
-      21: false,
-      22: false,
-      23: false,
-      24: true,
-      25: false
-    },
     offers: [
-      mockOffers.find((value) => value.id === '20'),
-      mockOffers.find((value) => value.id === '24')
+      mockOffers[5].offers[0].id,
+      mockOffers[5].offers[1].id
     ]
   },
   {
     id: '7',
-    type: getRandomArrayElement(TYPES_OF_POINT),
-    destination: mockDestinations.find((value) => value.id === '10'),
+    type: 'taxi',
+    destination: '10',
     dateFrom: '2023-05-12T13:41',
     dateTo: '2023-05-12T16:05',
     price: getRandomNumber(50, 500),
     isFavorite: true,
-    isOffer: {
-      20: false,
-      21: false,
-      22: true,
-      23: false,
-      24: false,
-      25: false
-    },
     offers: [
-      mockOffers.find((value) => value.id === '22')
+      mockOffers[0].offers[1].id,
+      mockOffers[0].offers[2].id
     ]
   },
   {
     id: '8',
-    type: getRandomArrayElement(TYPES_OF_POINT),
-    destination: mockDestinations.find((value) => value.id === '14'),
+    type: 'train',
+    destination: '14',
     dateFrom: '2023-05-15T18:34',
     dateTo: '2023-05-15T21:09',
     price: getRandomNumber(50, 500),
     isFavorite: false,
-    isOffer: {
-      20: false,
-      21: false,
-      22: true,
-      23: true,
-      24: false,
-      25: false
-    },
     offers: [
-      mockOffers.find((value) => value.id === '22'),
-      mockOffers.find((value) => value.id === '23')
+      mockOffers[2].offers[0].id,
+      mockOffers[2].offers[1].id
     ]
   },
   {
     id: '9',
-    type: getRandomArrayElement(TYPES_OF_POINT),
-    destination: mockDestinations.find((value) => value.id === '12'),
+    type: 'drive',
+    destination: '12',
     dateFrom: '2023-05-16T08:55',
     dateTo: '2023-05-16T11:39',
     price: getRandomNumber(50, 500),
     isFavorite: false,
-    isOffer: {
-      20: true,
-      21: true,
-      22: false,
-      23: false,
-      24: false,
-      25: true
-    },
     offers: [
-      mockOffers.find((value) => value.id === '20'),
-      mockOffers.find((value) => value.id === '21'),
-      mockOffers.find((value) => value.id === '25')
+      mockOffers[4].offers[0].id,
+      mockOffers[4].offers[1].id
     ]
   },
   {
     id: '10',
-    type: getRandomArrayElement(TYPES_OF_POINT),
-    destination: mockDestinations.find((value) => value.id === '10'),
+    type: 'ship',
+    destination: '10',
     dateFrom: '2023-05-21T22:51',
     dateTo: '2023-05-22T03:47',
     price: getRandomNumber(50, 500),
     isFavorite: false,
-    isOffer: {
-      20: false,
-      21: false,
-      22: false,
-      23: false,
-      24: true,
-      25: false
-    },
     offers: [
-      mockOffers.find((value) => value.id === '24')
+      mockOffers[3].offers[0].id
     ]
   }
 ];
@@ -337,4 +326,4 @@ function getRandomPoint() {
   };
 }
 
-export {getRandomPoint, mockOffers};
+export { getRandomPoint, mockOffers, mockDestinations};
