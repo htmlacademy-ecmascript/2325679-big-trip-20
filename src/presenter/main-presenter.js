@@ -36,7 +36,8 @@ export default class MainPresenter {
     const pointPresenter = new PointPresenter({
       eventListContainer: this.#eventListComponent.element,
       onDataChange: this.#handlePointChange,
-      onModeChange: this.#handleModeChange
+      onModeChange: this.#handleModeChange,
+      pointsModel: this.#pointsModel
     });
     pointPresenter.init(point);
     this.#pointPresenters.set(point.id, pointPresenter);

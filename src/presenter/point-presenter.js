@@ -15,11 +15,13 @@ export default class PointPresenter {
   #handleDataChange = null;
   #handleModeChange = null;
   #mode = Mode.DEFAULT;
+  #pointsModel = null;
 
-  constructor({eventListContainer, onDataChange, onModeChange}) {
+  constructor({eventListContainer, onDataChange, onModeChange, pointsModel}) {
     this.#eventListContainer = eventListContainer;
     this.#handleDataChange = onDataChange;
     this.#handleModeChange = onModeChange;
+    this.#pointsModel = pointsModel;
   }
 
   init(point) {
@@ -27,15 +29,20 @@ export default class PointPresenter {
 
     const prevPointComponent = this.#pointComponent;
     const prevPointEditComponent = this.#pointEditComponent;
+    const destination = this.#pointsModel.destinations.find((oneDestination) => oneDestination.id === this.#point.destination);
 
     this.#pointComponent = new EventView({
       point: this.#point,
+      destination: destination,
       onEditClick: this.#handleEditClick,
       onFavoriteClick: this.#handleFavoriteClick,
+      offers: this.#pointsModel.offers,
     });
 
     this.#pointEditComponent = new EditEventView({
       point: this.#point,
+      offers: this.#pointsModel.offers,
+      destinations: this.#pointsModel.destinations,
       onFormSubmit: this.#handleFormSubmit,
     });
 
