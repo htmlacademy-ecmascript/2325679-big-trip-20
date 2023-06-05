@@ -15,7 +15,11 @@ function humanizePointTime(time) {
 }
 
 function findDurationPointTime(timeTo, timeFrom) {
-  return dayjs.duration(Math.abs(dayjs(timeFrom) - dayjs(timeTo)), 'millisecond').format('HH[h] mm[m]');
+  return dayjs.duration(Math.abs(dayjs(timeFrom) - dayjs(timeTo)), 'millisecond');
+}
+
+function getFormatedDuration(timeTo, timeFrom, format) {
+  return dayjs.duration(Math.abs(dayjs(timeFrom) - dayjs(timeTo)), 'millisecond').format(format);
 }
 
 function convertDateTimePoint(date) {
@@ -56,4 +60,4 @@ function sortPriceUp(pointA, pointB) {
 }
 
 
-export {humanizePointDate, humanizePointTime, findDurationPointTime, convertDateTimePoint, sortPointUp, sortTimeUp, sortPriceUp};
+export {humanizePointDate, humanizePointTime, findDurationPointTime, convertDateTimePoint, sortPointUp, sortTimeUp, sortPriceUp, getFormatedDuration};

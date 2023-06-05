@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import {humanizePointDate, humanizePointTime, findDurationPointTime} from '../utils/point.js';
+import {humanizePointDate, humanizePointTime, findDurationPointTime, getFormatedDuration} from '../utils/point.js';
 
 function createEventTemplate(point, allOffers) {
   const {type, price, destination, isFavorite, offers, dateFrom, dateTo} = point;
@@ -9,6 +9,17 @@ function createEventTemplate(point, allOffers) {
   const timeTo = humanizePointTime(dateTo);
   const duration = findDurationPointTime(dateTo, dateFrom);
 
+  let format = '';
+
+  if (duration.$ms < 3600000) {
+    format = 'mm[m]';
+  } else if (duration.$ms >= 3600000 && duration.$ms < 3600000 * 24) {
+    format = 'HH[h] mm[m]';
+  } else if (duration.$ms >= 3600000 * 24) {
+    format = 'DD[d] HH[h] mm[m]';
+  }
+
+  const formalizedDuration = getFormatedDuration(dateTo, dateFrom, format);
   const offerType = allOffers.find((typeOffer) => typeOffer.type === type);
   const offersData = offerType.offers.map((offer) => ({
     ...offer,
@@ -32,7 +43,7 @@ function createEventTemplate(point, allOffers) {
           &mdash;
           <time class="event__end-time" datetime="${date}">${timeTo}</time>
         </p>
-        <p class="event__duration">${duration}</p>
+        <p class="event__duration">${formalizedDuration}</p>
       </div>
       <p class="event__price">
         &euro;&nbsp;<span class="event__price-value">${price}</span>
