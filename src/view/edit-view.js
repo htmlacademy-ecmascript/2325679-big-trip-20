@@ -10,6 +10,10 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {convertDateTimePoint} from '../utils/point.js';
 
+import flatpickr from 'flatpickr';
+
+import 'flatpickr/dist/flatpickr.min.css';
+
 function createOffer (offers) {
   return (
     `${offers.map((offer) => `<div class="event__offer-selector">
@@ -153,10 +157,13 @@ function createBlockTemplate(point) {
 export default class EditEventView extends AbstractStatefulView {
   #point = null;
   #handleFormSubmit = null;
+  #handleFormReset = null;
   #offers = null;
   #destinations = null;
+  #datepickerDateFrom = null;
+  #datepickerDateTo = null;
 
-  constructor({point, offers, destinations, onFormSubmit}) {
+  constructor({point, offers, destinations, onFormSubmit, onReset}) {
     super();
     this.#point = point;
     this.#offers = offers;
@@ -164,6 +171,7 @@ export default class EditEventView extends AbstractStatefulView {
 
     this._setState(EditEventView.parsePointToState(point, offers, destinations));
     this.#handleFormSubmit = onFormSubmit;
+    this.#handleFormReset = onReset;
     this._restoreHandlers();
   }
 
@@ -171,15 +179,37 @@ export default class EditEventView extends AbstractStatefulView {
     return createBlockTemplate(this._state);
   }
 
+  removeElement() {
+    super.removeElement();
+
+    if (this.#datepickerDateFrom) {
+      this.#datepickerDateFrom.destroy();
+      this.#datepickerDateFrom = null;
+    }
+
+    if (this.#datepickerDateTo) {
+      this.#datepickerDateTo.destroy();
+      this.#datepickerDateTo = null;
+    }
+  }
+
+  reset(point, offers, destinations) {
+    this.updateElement(
+      EditEventView.parsePointToState(point, offers, destinations),
+    );
+  }
+
   _restoreHandlers() {
     this.element.querySelector('form')
       .addEventListener('submit', this.#formSubmitHandler);
-    this.element.querySelector('form')
-      .addEventListener('reset', this.#formSubmitHandler);
+    this.element.querySelector('.event__reset-btn')
+      .addEventListener('click', this.#handleFormReset);
     this.element.querySelector('.event__type-list')
       .addEventListener('change', this.#typeChangeHandler);
     this.element.querySelector('.event__input--destination')
       .addEventListener('input', this.#destinationChangeHandler);
+
+    this.#setDatepicker();
   }
 
   /*   #getOffers = (value) => this._state.allOffers
@@ -211,10 +241,44 @@ export default class EditEventView extends AbstractStatefulView {
     }
   };
 
+  #dateFromChangeHandler = ([userDate]) => {
+    this.updateElement({
+      dateFrom: userDate,
+    });
+  };
+
+  #dateToChangeHandler = ([userDate]) => {
+    this.updateElement({
+      dateTo: userDate,
+    });
+  };
+
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
     this.#handleFormSubmit(EditEventView.parseStateToPoint(this._state));
   };
+
+  #setDatepicker() {
+    this.#datepickerDateFrom = flatpickr(
+      this.element.querySelector('.event__input--time[id="event-start-time-1"]'),
+      {
+        enableTime: true,
+        dateFormat: 'd/m/y H:i',
+        defaultDate: convertDateTimePoint(this._state.dateFrom),
+        onChange: this.#dateFromChangeHandler, // На событие flatpickr передаём наш колбэк
+      },
+    );
+
+    this.#datepickerDateTo = flatpickr(
+      this.element.querySelector('.event__input--time[id="event-end-time-1"]'),
+      {
+        enableTime: true,
+        dateFormat: 'd/m/y H:i',
+        defaultDate: convertDateTimePoint(this._state.dateTo),
+        onChange: this.#dateToChangeHandler, // На событие flatpickr передаём наш колбэк
+      },
+    );
+  }
 
   static parsePointToState(point, allOffers, allDestinations) {
     return {...point, allOffers, allDestinations
