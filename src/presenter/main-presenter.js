@@ -3,39 +3,55 @@ import SortView from '../view/sort-view.js';
 import EventListView from '../view/event-list-view.js';
 import NoPointView from '../view/no-point-view.js';
 import PointPresenter from './point-presenter.js';
-import {updateItem} from '../utils/common.js';
+import {filter} from '../utils/filter.js';
 import {sortPointUp, sortTimeUp, sortPriceUp} from '../utils/point.js';
-import {SortType} from '../const.js';
-
+import {SortType, UpdateType, UserAction, FilterType} from '../const.js';
 export default class MainPresenter {
   #sortComponent = null;
   #eventListComponent = new EventListView();
-  #noPointComponent = new NoPointView();
+  #noPointComponent = null;
 
   #container = null;
   #pointsModel = null;
-  #points = [];
+  #filterModel = null;
   #pointPresenters = new Map();
 
   #currentSortType = SortType.DEFAULT;
-  #sourcedBoardPoints = [];
+  #filterType = FilterType.EVERYTHING;
 
-  constructor({container, pointsModel}) {
+  constructor({container, pointsModel, filterModel}) {
     this.#container = container;
     this.#pointsModel = pointsModel;
+    this.#filterModel = filterModel;
+    this.#pointsModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
+  }
+
+  get points() {
+    this.#filterType = this.#filterModel.filter;
+    const points = this.#pointsModel.points;
+    const filteredPoints = filter[this.#filterType](points);
+
+    switch (this.#currentSortType) {
+      case SortType.DEFAULT:
+        return filteredPoints.sort(sortPointUp);
+      case SortType.TIME:
+        return filteredPoints.sort(sortTimeUp);
+      case SortType.PRICE:
+        return filteredPoints.sort(sortPriceUp);
+    }
+    return filteredPoints;
   }
 
   init() {
-    this.#points = [...this.#pointsModel.points];
-    this.#points.sort(sortPointUp);
-    this.#sourcedBoardPoints = [...this.#pointsModel.points];
+    [...this.#pointsModel.points].sort(sortPointUp);
     this.#renderBoard();
   }
 
   #renderPoint(point) {
     const pointPresenter = new PointPresenter({
       eventListContainer: this.#eventListComponent.element,
-      onDataChange: this.#handlePointChange,
+      onDataChange: this.#handleViewAction,
       onModeChange: this.#handleModeChange,
       pointsModel: this.#pointsModel
     });
@@ -47,29 +63,46 @@ export default class MainPresenter {
     this.#pointPresenters.forEach((presenter) => presenter.resetView());
   };
 
-  #handlePointChange = (updatedPoint) => {
-    this.#points = updateItem(this.#points, updatedPoint);
-    this.#sourcedBoardPoints = updateItem(this.#sourcedBoardPoints, updatedPoint);
-    this.#pointPresenters.get(updatedPoint.id).init(updatedPoint);
+  #handleViewAction = (actionType, updateType, update) => {
+    // Здесь будем вызывать обновление модели.
+    // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
+    // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
+    // update - обновленные данные
+    switch (actionType) {
+      case UserAction.UPDATE_POINT:
+        this.#pointsModel.updatePoint(updateType, update);
+        break;
+      case UserAction.ADD_POINT:
+        this.#pointsModel.addPoint(updateType, update);
+        break;
+      case UserAction.DELETE_POINT:
+        this.#pointsModel.deletePoint(updateType, update);
+        break;
+    }
   };
 
-  #sortPoints(sortType) {
-    switch (sortType) {
-      case SortType.DEFAULT:
-        this.#points.sort(sortPointUp);
+  #handleModelEvent = (updateType, data) => {
+    // В зависимости от типа изменений решаем, что делать:
+    // - обновить часть списка (например, когда поменялось описание)
+    // - обновить список (например, когда задача ушла в архив)
+    // - обновить всю доску (например, при переключении фильтра)
+    switch (updateType) {
+      case UpdateType.PATCH:
+        // - обновить часть списка (например, когда поменялось описание)
+        this.#pointPresenters.get(data.id).init(data);
         break;
-      case SortType.TIME:
-        this.#points.sort(sortTimeUp);
+      case UpdateType.MINOR:
+        // - обновить список (например, когда задача ушла в архив)
+        this.#clearBoard();
+        this.#renderBoard();
         break;
-      case SortType.PRICE:
-        this.#points.sort(sortPriceUp);
+      case UpdateType.MAJOR:
+        // - обновить всю доску (например, при переключении фильтра)
+        this.#clearBoard({resetSortType: true});
+        this.#renderBoard();
         break;
-      default:
-        this.#points = [...this.#sourcedBoardPoints];
     }
-
-    this.#currentSortType = sortType;
-  }
+  };
 
   #handleSortTypeChange = (sortType) => {
     // - Сортируем задачи
@@ -79,8 +112,8 @@ export default class MainPresenter {
       return;
     }
 
-    this.#sortPoints(sortType);
-    this.#clearPointList();
+    this.#currentSortType = sortType;
+    this.#clearBoard();
     this.#renderBoard();
   };
 
@@ -92,32 +125,44 @@ export default class MainPresenter {
     render(this.#sortComponent, this.#container, RenderPosition.AFTERBEGIN);
   }
 
-  #renderPoints() {
-    this.#points
-      .forEach((point) => this.#renderPoint(point));
+  #renderPoints(points) {
+    points.forEach((point) => this.#renderPoint(point));
   }
 
   #renderNoPoints() {
+    this.#noPointComponent = new NoPointView({
+      filterType: this.#filterType
+    });
+
     render(this.#noPointComponent, this.#container, RenderPosition.AFTERBEGIN);
   }
 
-  #clearPointList() {
+  #clearBoard({resetSortType = false} = {}) {
+
     this.#pointPresenters.forEach((presenter) => presenter.destroy());
     this.#pointPresenters.clear();
-    remove(this.#sortComponent);
-  }
 
-  #renderEventList() {
-    render(this.#eventListComponent, this.#container);
-    this.#renderPoints();
+    remove(this.#sortComponent);
+
+    if (this.#noPointComponent) {
+      remove(this.#noPointComponent);
+    }
+
+    if (resetSortType) {
+      this.#currentSortType = SortType.DEFAULT;
+    }
   }
 
   #renderBoard() {
-    this.#renderSort();
-    this.#renderEventList();
 
-    if (this.#points.length === 0) {
+    const points = this.points;
+
+    if (this.points.length === 0) {
       this.#renderNoPoints();
     }
+
+    this.#renderSort();
+    render(this.#eventListComponent, this.#container);
+    this.#renderPoints(points);
   }
 }

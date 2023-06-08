@@ -28,7 +28,6 @@ function createEventTemplate(point, allOffers) {
   );
 
   const checkedOffers = offersData.filter((value) => value.checked === true);
-
   return (
     `<li class="trip-events__item">
     <div class="event">

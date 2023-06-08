@@ -1,12 +1,3 @@
-// TODO: 1. Отрисовать динамически список типов
-// 2. Повесить обработчик события чтобы получать новый тип
-// 3. В setState закинуть новый тип и по этому типу массив офферов
-
-// TODO: 1. Отрисовать динамически список городов
-// 2. Повесить обработчик события на инпут с городами (можно onChange)
-// 3. Проверить, есть ли введенный город в списке
-// 4. В setState закинуть новый тип и по этому типу массив офферов
-
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {convertDateTimePoint} from '../utils/point.js';
 
@@ -203,7 +194,7 @@ export default class EditEventView extends AbstractStatefulView {
     this.element.querySelector('form')
       .addEventListener('submit', this.#formSubmitHandler);
     this.element.querySelector('.event__reset-btn')
-      .addEventListener('click', this.#handleFormReset);
+      .addEventListener('click', this.#formResetClickHandler);
     this.element.querySelector('.event__type-list')
       .addEventListener('change', this.#typeChangeHandler);
     this.element.querySelector('.event__input--destination')
@@ -256,6 +247,11 @@ export default class EditEventView extends AbstractStatefulView {
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
     this.#handleFormSubmit(EditEventView.parseStateToPoint(this._state));
+  };
+
+  #formResetClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFormReset(EditEventView.parseStateToPoint(this._state));
   };
 
   #setDatepicker() {
