@@ -45,7 +45,7 @@ export default class PointPresenter {
       offers: this.#pointsModel.offers,
       destinations: this.#pointsModel.destinations,
       onFormSubmit: this.#handleFormSubmit,
-      onReset: this.#handleResetForm,
+      onDeleteClick: this.#handleDeleteClick,
     });
 
 
@@ -100,9 +100,12 @@ export default class PointPresenter {
     this.#replaceFormToCard();
   };
 
-  #handleResetForm = () => {
-    this.#pointEditComponent.reset(this.#point, this.#pointsModel.offers, this.#pointsModel.destinations);
-    this.#replaceFormToCard();
+  #handleDeleteClick = (point) => {
+    this.#handleDataChange(
+      UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      point,
+    );
   };
 
   resetView() {
