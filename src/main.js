@@ -17,13 +17,13 @@ const filterModel = new FilterModel();
 const mainPresenter = new MainPresenter({
   container: siteMainElement,
   pointsModel,
-  filterModel
+  filterModel,
 });
 
 const filterPresenter = new FilterPresenter({
   filterContainer: siteFilterElement,
   filterModel,
-  pointsModel
+  pointsModel,
 });
 
 render(new HeaderView(), siteHeaderElement, RenderPosition.AFTERBEGIN);

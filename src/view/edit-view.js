@@ -46,12 +46,7 @@ function createDestinationList (value) {
 function createBlockTemplate(point) {
 
   const {type, price, destination, offers, dateFrom, dateTo, allOffers, allDestinations} = point;
-  /*   const offersData = offers.map((idOffer) => {
-    const offerType = allOffers.find((typeOffer) => typeOffer.type === type);
-    return offerType.offers.find((offer) => offer.id === idOffer);
-  }
-  );
-*/
+
   const offerType = allOffers.find((typeOffer) => typeOffer.type === type);
 
   const offersData = offerType.offers.map((offer) => ({
@@ -117,7 +112,7 @@ function createBlockTemplate(point) {
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
+        <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${price}">
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -199,26 +194,16 @@ export default class EditEventView extends AbstractStatefulView {
       .addEventListener('change', this.#typeChangeHandler);
     this.element.querySelector('.event__input--destination')
       .addEventListener('input', this.#destinationChangeHandler);
+    this.element.querySelector('.event__input--price')
+      .addEventListener('input', this.#priceChangeHandler);
 
     this.#setDatepicker();
   }
-
-  /*   #getOffers = (value) => this._state.allOffers
-    .find((typeOffer) => typeOffer.type.toLowerCase() === value).offers
-    .map((offer) => {
-      console.log('map1', offer);
-      return offer.checked === false;
-    })
-    .map((offer) => {
-      console.log('map2', offer);
-      return offer.id;
-    }); */
 
   #typeChangeHandler = (evt) => {
     evt.preventDefault();
     this.updateElement({
       type: evt.target.value,
-      //offers: this.#getOffers(evt.target.value)
     });
   };
 
@@ -230,6 +215,13 @@ export default class EditEventView extends AbstractStatefulView {
         destination: destination.id,
       });
     }
+  };
+
+  #priceChangeHandler = (evt) => {
+    evt.preventDefault();
+    this.updateElement({
+      price: evt.target.value,
+    });
   };
 
   #dateFromChangeHandler = ([userDate]) => {
@@ -283,7 +275,10 @@ export default class EditEventView extends AbstractStatefulView {
 
   static parseStateToPoint(state) {
     const point = {...state};
-
+    const offers = Array.from(document.querySelectorAll('.event__offer-checkbox'));
+    const checkedOffers = offers.filter((offer) => offer.checked === true);
+    const checkedOffersId = checkedOffers.map((checkedOffer) => checkedOffer.id.substring(12, checkedOffer.id.length));
+    point.offers = checkedOffersId;
     return point;
   }
 }
