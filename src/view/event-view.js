@@ -2,7 +2,7 @@ import AbstractView from '../framework/view/abstract-view.js';
 import {humanizePointDate, humanizePointTime, findDurationPointTime, getFormatedDuration} from '../utils/point.js';
 
 function createEventTemplate(point, allOffers) {
-  const {type, price, destination, isFavorite, offers, dateFrom, dateTo} = point;
+  const {type = 'taxi', price, destination, isFavorite, offers, dateFrom, dateTo} = point;
   const favouriteClass = isFavorite ? 'event__favorite-btn--active' : '';
   const date = humanizePointDate(dateFrom);
   const timeFrom = humanizePointTime(dateFrom);
@@ -21,6 +21,7 @@ function createEventTemplate(point, allOffers) {
 
   const formalizedDuration = getFormatedDuration(dateTo, dateFrom, format);
   const offerType = allOffers.find((typeOffer) => typeOffer.type === type);
+
   const offersData = offerType.offers.map((offer) => ({
     ...offer,
     checked: offers.includes(offer.id),
@@ -28,7 +29,6 @@ function createEventTemplate(point, allOffers) {
   );
 
   const checkedOffers = offersData.filter((value) => value.checked === true);
-
   return (
     `<li class="trip-events__item">
     <div class="event">
@@ -82,6 +82,7 @@ export default class EventView extends AbstractView {
     this.#handleEditClick = onEditClick;
     this.#handleFavoriteClick = onFavoriteClick;
     this.#offers = offers;
+
     this.#point.destination = destination;
 
     this.element.querySelector('.event__rollup-btn')

@@ -295,8 +295,8 @@ const mockPoints = [
     id: '9',
     type: 'drive',
     destination: '12',
-    dateFrom: '2023-05-16T08:55',
-    dateTo: '2023-05-16T11:39',
+    dateFrom: '2023-06-16T08:55',
+    dateTo: '2023-06-16T11:39',
     price: getRandomNumber(50, 500),
     isFavorite: false,
     offers: [
@@ -308,8 +308,8 @@ const mockPoints = [
     id: '10',
     type: 'ship',
     destination: '10',
-    dateFrom: '2023-05-21T22:51',
-    dateTo: '2023-05-22T03:47',
+    dateFrom: '2023-06-21T22:51',
+    dateTo: '2023-06-22T03:47',
     price: getRandomNumber(50, 500),
     isFavorite: false,
     offers: [
