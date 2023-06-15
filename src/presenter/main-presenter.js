@@ -7,11 +7,12 @@ import {filter} from '../utils/filter.js';
 import {sortPointUp, sortTimeUp, sortPriceUp} from '../utils/point.js';
 import {SortType, UpdateType, UserAction, FilterType} from '../const.js';
 import NewPointPresenter from './new-point-presenter.js';
+import LoadingView from '../view/loading-view.js';
 export default class MainPresenter {
   #sortComponent = null;
   #eventListComponent = new EventListView();
   #noPointComponent = null;
-
+  #loadingComponent = new LoadingView();
   #container = null;
   #pointsModel = null;
   #filterModel = null;
@@ -19,6 +20,7 @@ export default class MainPresenter {
   #newPointPresenter = null;
   #currentSortType = SortType.DEFAULT;
   #filterType = FilterType.EVERYTHING;
+  #isLoading = true;
 
   constructor({container, pointsModel, filterModel, onNewPointDestroy}) {
     this.#container = container;
@@ -116,6 +118,11 @@ export default class MainPresenter {
         this.#clearBoard({resetSortType: true});
         this.#renderBoard();
         break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#renderBoard();
+        break;
     }
   };
 
@@ -144,6 +151,10 @@ export default class MainPresenter {
     points.forEach((point) => this.#renderPoint(point));
   }
 
+  #renderLoading() {
+    render(this.#loadingComponent, this.#container, RenderPosition.AFTERBEGIN);
+  }
+
   #renderNoPoints() {
     this.#noPointComponent = new NoPointView({
       filterType: this.#filterType
@@ -158,6 +169,7 @@ export default class MainPresenter {
     this.#pointPresenters.clear();
 
     remove(this.#sortComponent);
+    remove(this.#loadingComponent);
 
     if (this.#noPointComponent) {
       remove(this.#noPointComponent);
@@ -171,6 +183,11 @@ export default class MainPresenter {
   #renderBoard() {
 
     const points = this.points;
+
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
 
     if (this.points.length === 0) {
       this.#renderNoPoints();
