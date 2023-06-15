@@ -5,11 +5,11 @@ import flatpickr from 'flatpickr';
 import dayjs from 'dayjs';
 import 'flatpickr/dist/flatpickr.min.css';
 
-function createOffer (offers) {
+function createOffer (offers, isDisabled) {
   return (
     `${offers.map((offer) => `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}" type="checkbox" name="event-offer-${offer.id}" ${offer.checked ? 'checked' : ''}>
-      <label class="event__offer-label" for="event-offer-${offer.id}">
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}" type="checkbox" name="event-offer-${offer.id}" ${offer.checked ? 'checked' : ''} ${isDisabled ? 'disabled' : ''}>
+      <label class="event__offer-label" for="event-offer-${offer.id}" ${isDisabled ? 'disabled' : ''}>
         <span class="event__offer-title">${offer.title}</span>
         &plus;&euro;&nbsp;
         <span class="event__offer-price">${offer.price}</span>
@@ -27,12 +27,12 @@ function createImgDescription (destination) {
   }
 }
 
-function createTypeList(value, typePoint) {
+function createTypeList(value, typePoint, isDisabled) {
   const {type} = value;
   return (
     `<div class="event__type-item">
-    <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}" ${type === typePoint ? 'checked' : ''}>
-    <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${type.charAt(0).toUpperCase() + type.slice(1)}</label>
+    <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}" ${isDisabled ? 'disabled' : ''} ${type === typePoint ? 'checked' : ''}>
+    <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1" ${isDisabled ? 'disabled' : ''}>${type.charAt(0).toUpperCase() + type.slice(1)}</label>
   </div>
     `
   );
@@ -47,7 +47,7 @@ function createDestinationList (value) {
 
 function createBlockTemplate(point) {
 
-  const {type = 'taxi', price, destination, offers = [], dateFrom, dateTo, allOffers, allDestinations} = point;
+  const {type = 'taxi', price, destination, offers = [], dateFrom, dateTo, allOffers, allDestinations, isDisabled, isSaving, isDeleting} = point;
 
   const offerType = allOffers.find((typeOffer) => typeOffer.type === type);
 
@@ -57,16 +57,15 @@ function createBlockTemplate(point) {
   })
   );
 
-  //console.log(offersData);
   const uniqueDestination = allDestinations.find((oneDestination) => oneDestination.id === destination);
 
   const timeFrom = convertDateTimePoint(dateFrom);
   const timeTo = convertDateTimePoint(dateTo);
-  const repeatingOffer = createOffer(offersData);
+  const repeatingOffer = createOffer(offersData, isDisabled);
   const repeatingImg = createImgDescription(uniqueDestination);
 
   const typeItemsTemplate = allOffers
-    .map((value) => createTypeList(value, type))
+    .map((value) => createTypeList(value, type, isDisabled))
     .join('');
 
   const destinationsTemplate = allDestinations
@@ -93,21 +92,21 @@ function createBlockTemplate(point) {
       </div>
 
       <div class="event__field-group  event__field-group--destination">
-        <label class="event__label  event__type-output" for="event-destination-1">
+        <label class="event__label  event__type-output" for="event-destination-1" ${isDisabled ? 'disabled' : ''}>
         ${type}
         </label>
-        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${uniqueDestination ? uniqueDestination.name : ''}" list="destination-list-1">
-        <datalist id="destination-list-1">
+        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${uniqueDestination ? uniqueDestination.name : ''}" list="destination-list-1" ${isDisabled ? 'disabled' : ''}>
+        <datalist id="destination-list-1" ${isDisabled ? 'disabled' : ''}>
           ${destinationsTemplate}
         </datalist>
       </div>
 
       <div class="event__field-group  event__field-group--time">
         <label class="visually-hidden" for="event-start-time-1">From</label>
-        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${timeFrom}">
+        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${timeFrom}" ${isDisabled ? 'disabled' : ''}>
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">To</label>
-        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${timeTo}">
+        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${timeTo}" ${isDisabled ? 'disabled' : ''}>
       </div>
 
       <div class="event__field-group  event__field-group--price">
@@ -115,16 +114,16 @@ function createBlockTemplate(point) {
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${price}">
+        <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${price}" ${isDisabled ? 'disabled' : ''}>
       </div>
 
-      <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-      <button class="event__reset-btn" type="reset">Delete</button>
+      <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
+      <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>${isDeleting ? 'Deleting...' : 'Delete'}</button>
     </header>
     <section class="event__details">
 
 
-        <section class="event__section  event__section--offers">
+        <section class="event__section  event__section--offers" ${isDisabled ? 'disabled' : ''}>
         <h3 class="event__section-title  event__section-title--offers">Offers</h3><div class="event__available-offers">${repeatingOffer}</div></section>
 
       <section class="event__section  event__section--destination">
@@ -273,7 +272,12 @@ export default class EditEventView extends AbstractStatefulView {
   };
 
   static parsePointToState(point, allOffers, allDestinations) {
-    return {...point, allOffers, allDestinations
+    return {...point,
+      allOffers,
+      allDestinations,
+      isDisabled: false,
+      isSaving: false,
+      isDeleting: false,
     };
   }
 
@@ -285,6 +289,11 @@ export default class EditEventView extends AbstractStatefulView {
     point.offers = checkedOffersId;
     point.dateFrom = dayjs(point.dateFrom).format();
     point.dateTo = dayjs(point.dateTo).format();
+
+    delete point.isDisabled;
+    delete point.isSaving;
+    delete point.isDeleting;
+
     return point;
   }
 }
