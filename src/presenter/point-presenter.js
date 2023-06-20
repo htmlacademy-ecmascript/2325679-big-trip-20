@@ -46,6 +46,7 @@ export default class PointPresenter {
       destinations: this.#pointsModel.destinations,
       onFormSubmit: this.#handleFormSubmit,
       onDeleteClick: this.#handleDeleteClick,
+      onFormExit: this.#handleExitHandler,
     });
 
 
@@ -78,6 +79,11 @@ export default class PointPresenter {
       this.#pointEditComponent.reset(this.#point, this.#pointsModel.offers, this.#pointsModel.destinations);
       this.#replaceFormToCard();
     }
+  };
+
+  #handleExitHandler = () => {
+    this.#pointEditComponent.reset(this.#point, this.#pointsModel.offers, this.#pointsModel.destinations);
+    this.#replaceFormToCard();
   };
 
   #handleFavoriteClick = () => {
