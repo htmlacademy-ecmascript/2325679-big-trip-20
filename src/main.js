@@ -45,7 +45,6 @@ function handleNewPointFormClose() {
 function handleNewPointButtonClick() {
   mainPresenter.createPoint();
   newPointButtonComponent.element.disabled = true;
-  document.querySelector('.event__reset-btn').textContent = 'Cancel';
 }
 
 render(new HeaderView(), siteHeaderElement, RenderPosition.AFTERBEGIN);

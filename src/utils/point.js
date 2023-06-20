@@ -51,12 +51,12 @@ function sortTimeUp(pointA, pointB) {
   const diffTimePointA = dayjs(pointA.dateTo).diff(dayjs(pointA.dateFrom));
   const diffTimePointB = dayjs(pointB.dateTo).diff(dayjs(pointB.dateFrom));
   const weight = getWeightForNullDate(diffTimePointA, diffTimePointB);
-  return weight ?? dayjs(diffTimePointA).diff(dayjs(diffTimePointB));
+  return weight ?? dayjs(diffTimePointB).diff(dayjs(diffTimePointA));
 }
 
 function sortPriceUp(pointA, pointB) {
   const weight = getWeightForNullDate(pointA.price, pointB.price);
-  return weight ?? pointA.price - pointB.price;
+  return weight ?? pointB.price - pointA.price;
 }
 
 
